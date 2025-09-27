@@ -1,0 +1,340 @@
+<div class="inspections-container p-6">
+  <!-- Header -->
+  <mat-card class="mb-4">
+    <mat-card-content class="py-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Inspections</h1>
+          <p class="text-gray-600 mt-1">Manage and track all property inspections</p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button 
+            mat-stroked-button 
+            (click)="toggleFilters()"
+            [color]="showFilters ? 'primary' : ''">
+            <mat-icon class="mr-1">filter_list</mat-icon>
+            {{ showFilters ? 'Hide' : 'Show' }} Filters
+          </button>
+          <button mat-stroked-button [matMenuTriggerFor]="exportMenu">
+            <mat-icon class="mr-1">download</mat-icon>
+            Export
+          </button>
+          <mat-menu #exportMenu="matMenu">
+            <button mat-menu-item (click)="exportInspections('excel')">
+              <mat-icon>table_chart</mat-icon>
+              <span>Export as Excel</span>
+            </button>
+            <button mat-menu-item (click)="exportInspections('pdf')">
+              <mat-icon>picture_as_pdf</mat-icon>
+              <span>Export as PDF</span>
+            </button>
+          </mat-menu>
+          <button 
+            mat-raised-button 
+            color="primary"
+            (click)="createInspection()">
+            <mat-icon class="mr-1">add</mat-icon>
+            New Inspection
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Filters -->
+  <mat-card *ngIf="showFilters" class="mb-4 animate-slide-in">
+    <mat-card-content>
+      <form [formGroup]="filterForm" class="filter-form">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Search -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Search</mat-label>
+            <input matInput formControlName="search" placeholder="Search inspections...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <!-- Status Filter -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status" multiple>
+              <mat-option *ngFor="let status of statusOptions" [value]="status">
+                {{ formatStatus(status) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Type Filter -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Type</mat-label>
+            <mat-select formControlName="type" multiple>
+              <mat-option *ngFor="let type of typeOptions" [value]="type">
+                {{ formatType(type) }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Priority Filter -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Priority</mat-label>
+            <mat-select formControlName="priority" multiple>
+              <mat-option *ngFor="let priority of priorityOptions" [value]="priority">
+                {{ priority | uppercase }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Date From -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Date From</mat-label>
+            <input matInput [matDatepicker]="dateFrom" formControlName="dateFrom">
+            <mat-datepicker-toggle matSuffix [for]="dateFrom"></mat-datepicker-toggle>
+            <mat-datepicker #dateFrom></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Date To -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Date To</mat-label>
+            <input matInput [matDatepicker]="dateTo" formControlName="dateTo">
+            <mat-datepicker-toggle matSuffix [for]="dateTo"></mat-datepicker-toggle>
+            <mat-datepicker #dateTo></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Has Defects -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Has Defects</mat-label>
+            <mat-select formControlName="hasDefects">
+              <mat-option [value]="null">All</mat-option>
+              <mat-option [value]="true">With Defects</mat-option>
+              <mat-option [value]="false">No Defects</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Payment Status -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Payment Status</mat-label>
+            <mat-select formControlName="isPaid">
+              <mat-option [value]="null">All</mat-option>
+              <mat-option [value]="true">Paid</mat-option>
+              <mat-option [value]="false">Unpaid</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="flex justify-end space-x-2 mt-4">
+          <button mat-button type="button" (click)="clearFilters()">
+            Clear Filters
+          </button>
+          <button mat-raised-button color="primary" type="button" (click)="applyFilters()">
+            Apply Filters
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center h-64">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+
+  <!-- View Toggle -->
+  <div *ngIf="!loading && inspections.length > 0" class="mb-4 flex justify-end">
+    <button mat-icon-button 
+            [color]="viewMode === 'table' ? 'primary' : ''"
+            (click)="viewMode = 'table'"
+            matTooltip="Table View">
+      <mat-icon>table_chart</mat-icon>
+    </button>
+    <button mat-icon-button 
+            [color]="viewMode === 'grid' ? 'primary' : ''"
+            (click)="viewMode = 'grid'"
+            matTooltip="Grid View">
+      <mat-icon>grid_view</mat-icon>
+    </button>
+  </div>
+
+  <!-- Table View -->
+  <mat-card *ngIf="!loading && viewMode === 'table'" class="overflow-hidden">
+    <mat-card-content class="p-0">
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="dataSource" matSort class="w-full">
+          <!-- Property Column -->
+          <ng-container matColumnDef="property">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Property</th>
+            <td mat-cell *matCellDef="let inspection">
+              <div>
+                <p class="font-medium text-gray-900">{{ inspection.propertyAddress }}</p>
+                <p class="text-xs text-gray-500">{{ inspection.propertyType | titlecase }}</p>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Client Column -->
+          <ng-container matColumnDef="client">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Client</th>
+            <td mat-cell *matCellDef="let inspection">
+              <div>
+                <p class="font-medium">{{ inspection.clientName }}</p>
+                <p class="text-xs text-gray-500">{{ inspection.clientPhone }}</p>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Inspector Column -->
+          <ng-container matColumnDef="inspector">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Inspector</th>
+            <td mat-cell *matCellDef="let inspection">
+              {{ inspection.inspectorName }}
+            </td>
+          </ng-container>
+
+          <!-- Scheduled Date Column -->
+          <ng-container matColumnDef="scheduledDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Scheduled</th>
+            <td mat-cell *matCellDef="let inspection">
+              {{ inspection.scheduledDate | date:'short' }}
+            </td>
+          </ng-container>
+
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let inspection">
+              <mat-chip class="text-xs">
+                {{ formatType(inspection.type) }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Priority Column -->
+          <ng-container matColumnDef="priority">
+            <th mat-header-cell *matHeaderCellDef>Priority</th>
+            <td mat-cell *matCellDef="let inspection">
+              <mat-chip [color]="getPriorityColor(inspection.priority)" class="text-xs">
+                {{ inspection.priority | uppercase }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+            <td mat-cell *matCellDef="let inspection">
+              <div class="flex items-center">
+                <mat-icon class="text-sm mr-1" [ngClass]="'text-' + getStatusColor(inspection.status) + '-600'">
+                  {{ getStatusIcon(inspection.status) }}
+                </mat-icon>
+                <span [ngClass]="'text-' + getStatusColor(inspection.status) + '-600'" class="font-medium">
+                  {{ formatStatus(inspection.status) }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let inspection">
+              <button mat-icon-button [matMenuTriggerFor]="menu">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="viewInspection(inspection)">
+                  <mat-icon>visibility</mat-icon>
+                  <span>View</span>
+                </button>
+                <button mat-menu-item (click)="editInspection(inspection)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Edit</span>
+                </button>
+                <button mat-menu-item (click)="deleteInspection(inspection)" 
+                        [disabled]="inspection.status === 'completed'">
+                  <mat-icon>delete</mat-icon>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+              class="hover:bg-gray-50 cursor-pointer"
+              (click)="viewInspection(row)"></tr>
+        </table>
+      </div>
+
+      <mat-paginator 
+        [pageSizeOptions]="[10, 25, 50, 100]" 
+        [showFirstLastButtons]="true">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Grid View -->
+  <div *ngIf="!loading && viewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <mat-card *ngFor="let inspection of inspections" 
+              class="cursor-pointer hover:shadow-lg transition-shadow"
+              (click)="viewInspection(inspection)">
+      <mat-card-header>
+        <mat-card-title class="text-lg">
+          {{ inspection.propertyAddress }}
+        </mat-card-title>
+        <mat-card-subtitle>
+          {{ inspection.clientName }} • {{ inspection.scheduledDate | date:'short' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600">Inspector:</span>
+            <span class="font-medium">{{ inspection.inspectorName }}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600">Type:</span>
+            <mat-chip class="text-xs">{{ formatType(inspection.type) }}</mat-chip>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600">Priority:</span>
+            <mat-chip [color]="getPriorityColor(inspection.priority)" class="text-xs">
+              {{ inspection.priority | uppercase }}
+            </mat-chip>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600">Status:</span>
+            <div class="flex items-center">
+              <mat-icon class="text-sm mr-1" [ngClass]="'text-' + getStatusColor(inspection.status) + '-600'">
+                {{ getStatusIcon(inspection.status) }}
+              </mat-icon>
+              <span [ngClass]="'text-' + getStatusColor(inspection.status) + '-600'" class="font-medium text-sm">
+                {{ formatStatus(inspection.status) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button color="primary" (click)="viewInspection(inspection); $event.stopPropagation()">
+          VIEW
+        </button>
+        <button mat-button (click)="editInspection(inspection); $event.stopPropagation()">
+          EDIT
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Empty State -->
+  <mat-card *ngIf="!loading && inspections.length === 0" class="text-center py-12">
+    <mat-card-content>
+      <mat-icon class="text-6xl text-gray-400 mb-4">assignment</mat-icon>
+      <h2 class="text-xl font-semibold text-gray-900 mb-2">No Inspections Found</h2>
+      <p class="text-gray-600 mb-6">
+        {{ showFilters ? 'No inspections match your filter criteria.' : 'Get started by creating your first inspection.' }}
+      </p>
+      <button mat-raised-button color="primary" (click)="createInspection()">
+        <mat-icon class="mr-1">add</mat-icon>
+        Create New Inspection
+      </button>
+    </mat-card-content>
+  </mat-card>
+</div>

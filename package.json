@@ -1,0 +1,38 @@
+{
+  "name": "@ihub/source",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "build": "nx build",
+    "test": "nx test",
+    "lint": "nx workspace-lint && nx lint",
+    "e2e": "nx e2e",
+    "affected:apps": "nx affected:apps",
+    "affected:libs": "nx affected:libs",
+    "affected:build": "nx affected:build",
+    "affected:e2e": "nx affected:e2e",
+    "affected:test": "nx affected:test",
+    "affected:lint": "nx affected:lint",
+    "affected:dep-graph": "nx affected:dep-graph",
+    "affected": "nx affected",
+    "format": "nx format:write",
+    "format:write": "nx format:write",
+    "format:check": "nx format:check",
+    "update": "nx migrate latest",
+    "workspace-generator": "nx workspace-generator",
+    "dep-graph": "nx dep-graph",
+    "help": "nx help",
+    "start": "nx serve ihub-angular",
+    "serve": "nx serve ihub-angular"
+  },
+  "private": true,
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^20.3.3",
+    "@angular/cli": "^20.3.3",
+    "@angular/compiler-cli": "^20.3.2",
+    "@nx/angular": "^21.5.3",
+    "@nx/workspace": "^21.5.3",
+    "nx": "^21.5.3",
+    "nx-cloud": "^19.1.0"
+  }
+}

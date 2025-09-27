@@ -1,0 +1,106 @@
+<div class="sidebar" [class.collapsed]="isCollapsed">
+  <!-- Logo and App Name -->
+  <div class="sidebar-header">
+    <div class="logo-container" (click)="toggleCollapse()">
+      <div class="logo">
+        <mat-icon class="logo-icon">home_work</mat-icon>
+      </div>
+      <span class="app-name" *ngIf="!isCollapsed">{{ appName }}</span>
+    </div>
+    <button mat-icon-button class="toggle-btn" (click)="toggleCollapse()" 
+            [matTooltip]="isCollapsed ? 'Expand' : 'Collapse'" matTooltipPosition="right">
+      <mat-icon>{{ isCollapsed ? 'menu' : 'menu_open' }}</mat-icon>
+    </button>
+  </div>
+
+  <!-- User Info -->
+  <div class="user-section" *ngIf="user">
+    <div class="user-avatar">
+      <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" alt="User avatar">
+      <div *ngIf="!user.avatarUrl" class="avatar-placeholder">
+        {{ getUserInitials() }}
+      </div>
+    </div>
+    <div class="user-info" *ngIf="!isCollapsed">
+      <div class="user-name">{{ user.fullName }}</div>
+      <div class="user-role">{{ getUserRoleLabel() }}</div>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- Navigation Menu -->
+  <nav class="sidebar-nav">
+    <ng-container *ngFor="let item of navigationItems">
+      <!-- Divider -->
+      <mat-divider *ngIf="item.divider" class="nav-divider"></mat-divider>
+      
+      <!-- Single Item without children -->
+      <a *ngIf="!item.divider && !item.children" 
+         mat-list-item 
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         class="nav-item"
+         [matTooltip]="isCollapsed ? item.title : ''"
+         matTooltipPosition="right">
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <span matListItemTitle *ngIf="!isCollapsed">
+          {{ item.title }}
+          <span *ngIf="item.badge" 
+                class="nav-badge" 
+                [class.badge-warn]="item.badgeColor === 'warn'"
+                [class.badge-accent]="item.badgeColor === 'accent'">
+            {{ item.badge }}
+          </span>
+        </span>
+      </a>
+
+      <!-- Item with children (expandable) -->
+      <div *ngIf="!item.divider && item.children" class="nav-group">
+        <button mat-list-item 
+                (click)="toggleExpanded(item.id)"
+                class="nav-item nav-parent"
+                [class.active]="isActive(item)"
+                [matTooltip]="isCollapsed ? item.title : ''"
+                matTooltipPosition="right">
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span matListItemTitle *ngIf="!isCollapsed" class="flex items-center justify-between w-full">
+            <span>{{ item.title }}</span>
+            <mat-icon class="expand-icon" [class.expanded]="isExpanded(item.id)">
+              expand_more
+            </mat-icon>
+          </span>
+        </button>
+        
+        <!-- Expanded children -->
+        <div class="nav-children" 
+             *ngIf="!isCollapsed && isExpanded(item.id)"
+             [@expandCollapse]="isExpanded(item.id) ? 'expanded' : 'collapsed'">
+          <a *ngFor="let child of item.children"
+             mat-list-item
+             [routerLink]="child.route"
+             routerLinkActive="active"
+             class="nav-child">
+            <mat-icon matListItemIcon class="child-icon">{{ child.icon }}</mat-icon>
+            <span matListItemTitle>
+              {{ child.title }}
+              <span *ngIf="child.badge" 
+                    class="nav-badge" 
+                    [class.badge-warn]="child.badgeColor === 'warn'"
+                    [class.badge-accent]="child.badgeColor === 'accent'">
+                {{ child.badge }}
+              </span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </ng-container>
+  </nav>
+
+  <!-- Footer -->
+  <div class="sidebar-footer" *ngIf="!isCollapsed">
+    <div class="footer-content">
+      <span class="text-xs text-gray-500">v{{ appVersion || '1.0.0' }}</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+.inspection-form-card {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-radius: 0.5rem;
+  max-width: 100%;
+  padding: 2rem;
+
+  mat-card-header {
+    display: block;
+  }
+
+  .form-section {
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+
+    h3 {
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 0.5rem;
+    }
+  }
+
+  mat-form-field {
+    margin-bottom: 0.5rem;
+  }
+
+  .mat-mdc-form-field {
+    .mdc-text-field--outlined {
+      transition: all 0.2s;
+
+      &:hover {
+        border-color: #3b82f6;
+      }
+    }
+  }
+
+  .mat-mdc-raised-button:not([disabled]) {
+    transition: all 0.2s;
+    transform: translateY(0);
+
+    &:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      transform: translateY(-0.125rem);
+    }
+  }
+
+  .mat-mdc-stroked-button:not([disabled]) {
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: #f9fafb;
+    }
+  }
+}

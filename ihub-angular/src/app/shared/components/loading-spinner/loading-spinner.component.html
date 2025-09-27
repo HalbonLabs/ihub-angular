@@ -1,0 +1,13 @@
+<div class="spinner-container" 
+     [class.overlay]="overlay"
+     [class.full-screen]="fullScreen">
+  <div class="spinner-content">
+    <mat-spinner 
+      [diameter]="diameter"
+      [color]="color">
+    </mat-spinner>
+    <div class="spinner-message" *ngIf="message">
+      {{ message }}
+    </div>
+  </div>
+</div>

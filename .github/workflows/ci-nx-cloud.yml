@@ -1,0 +1,84 @@
+name: CI with Nx Cloud
+
+on:
+  push:
+    branches: ['main', 'master', 'develop']
+  pull_request:
+    branches: ['main', 'master', 'develop']
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      # Start Nx Cloud CI run with task distribution
+      - name: Start Nx Cloud CI Run
+        run: npx nx-cloud start-ci-run --distribute-on="5 linux-medium-js" --stop-agents-after="e2e"
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Set up Nx SHAs
+        uses: nrwl/nx-set-shas@v4
+
+      # Run tasks affected by changes
+      - name: Run Nx Affected
+        run: |
+          npx nx affected --target=lint --parallel=3
+          npx nx affected --target=test --parallel=3 --ci --code-coverage
+          npx nx affected --target=build --parallel=3
+
+      # Optional: Run E2E tests if they exist
+      # - name: Run E2E tests
+      #   run: npx nx affected --target=e2e --parallel=1
+
+      # Upload coverage reports
+      - name: Upload coverage reports
+        if: matrix.node-version == 20
+        uses: codecov/codecov-action@v4
+        with:
+          directory: ./coverage
+
+  agents:
+    runs-on: ubuntu-latest
+    name: Agent ${{ matrix.agent }}
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        agent: [1, 2, 3]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Start Nx Agent
+        run: npx nx-cloud start-agent
+        env:
+          NX_AGENT_NAME: ${{ matrix.agent }}

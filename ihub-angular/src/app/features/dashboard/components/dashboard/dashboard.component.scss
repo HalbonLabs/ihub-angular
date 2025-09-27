@@ -1,0 +1,53 @@
+.dashboard-container {
+  @apply bg-gray-50 min-h-screen;
+}
+
+.stat-card {
+  @apply border-0 transition-all duration-200;
+  
+  &:hover {
+    @apply transform -translate-y-1;
+  }
+}
+
+.activity-list {
+  max-height: 400px;
+  overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded;
+  }
+}
+
+.chart-placeholder {
+  @apply bg-gray-50 rounded-lg border-2 border-dashed border-gray-300;
+}
+
+// Material table customization
+::ng-deep {
+  .mat-mdc-table {
+    @apply bg-transparent;
+    
+    .mat-mdc-header-row {
+      @apply bg-gray-50;
+    }
+    
+    .mat-mdc-row {
+      @apply hover:bg-gray-50 transition-colors;
+    }
+    
+    .mat-mdc-cell, .mat-mdc-header-cell {
+      @apply text-sm;
+    }
+  }
+  
+  .mat-mdc-chip {
+    @apply font-medium;
+    height: 24px;
+    font-size: 0.75rem;
+  }
+}

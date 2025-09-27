@@ -1,0 +1,222 @@
+<div class="dashboard-container p-6">
+  <!-- Header -->
+  <div class="dashboard-header mb-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">
+          {{ greeting }}, {{ (currentUser$ | async)?.fullName || 'User' }}
+        </h1>
+        <p class="text-gray-600 mt-1">Here's what's happening with your inspections today</p>
+      </div>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="refreshDashboard()"
+        [disabled]="loading">
+        <mat-icon class="mr-2">refresh</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center h-64">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading" class="dashboard-content">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <mat-card 
+        *ngFor="let stat of stats" 
+        class="stat-card cursor-pointer hover:shadow-lg transition-shadow"
+        (click)="navigateToStat(stat.route)">
+        <mat-card-content class="p-4">
+          <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 rounded-lg flex items-center justify-center" 
+                 [ngClass]="'bg-' + stat.color + '-100'">
+              <mat-icon [ngClass]="'text-' + stat.color + '-600'">{{ stat.icon }}</mat-icon>
+            </div>
+            <mat-chip 
+              [ngClass]="stat.change > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+              class="text-xs">
+              <mat-icon class="text-sm mr-1">{{ stat.change > 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+              {{ stat.change > 0 ? '+' : '' }}{{ stat.change }}%
+            </mat-chip>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900">{{ stat.value }}</h3>
+          <p class="text-sm text-gray-600 mt-1">{{ stat.title }}</p>
+          <p class="text-xs text-gray-500 mt-2">{{ stat.changeLabel }}</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <!-- Monthly Inspections Chart -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Monthly Inspections</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-placeholder h-64 flex items-center justify-center text-gray-500">
+            <div class="text-center">
+              <mat-icon class="text-6xl mb-2">insert_chart</mat-icon>
+              <p>Chart visualization would go here</p>
+              <p class="text-sm mt-2">Integrate with Chart.js or similar</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Defects by Category Chart -->
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Defects by Category</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-placeholder h-64 flex items-center justify-center text-gray-500">
+            <div class="text-center">
+              <mat-icon class="text-6xl mb-2">pie_chart</mat-icon>
+              <p>Chart visualization would go here</p>
+              <p class="text-sm mt-2">Integrate with Chart.js or similar</p>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Recent Activity and Pending Inspections -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Recent Activity -->
+      <mat-card class="lg:col-span-1">
+        <mat-card-header>
+          <mat-card-title>Recent Activity</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="activitiesLoading" class="flex justify-center py-8">
+            <mat-spinner diameter="32"></mat-spinner>
+          </div>
+          <div *ngIf="!activitiesLoading" class="activity-list">
+            <div *ngFor="let activity of recentActivities; let last = last" 
+                 class="activity-item py-3" 
+                 [class.border-b]="!last">
+              <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                     [ngClass]="'bg-' + activity.color + '-100'">
+                  <mat-icon [ngClass]="'text-' + activity.color + '-600'" class="text-sm">{{ activity.icon }}</mat-icon>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-gray-900">{{ activity.title }}</p>
+                  <p class="text-xs text-gray-600 truncate">{{ activity.description }}</p>
+                  <div class="flex items-center mt-1">
+                    <span class="text-xs text-gray-500">{{ activity.user }}</span>
+                    <span class="mx-1 text-xs text-gray-400">•</span>
+                    <span class="text-xs text-gray-500">{{ getRelativeTime(activity.timestamp) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-center mt-4">
+              <button mat-button color="primary">View All Activity</button>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Pending Inspections -->
+      <mat-card class="lg:col-span-2">
+        <mat-card-header>
+          <div class="flex items-center justify-between w-full">
+            <mat-card-title>Pending Inspections</mat-card-title>
+            <button mat-button color="primary">View All</button>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="inspectionsLoading" class="flex justify-center py-8">
+            <mat-spinner diameter="32"></mat-spinner>
+          </div>
+          <div *ngIf="!inspectionsLoading" class="overflow-x-auto">
+            <table mat-table [dataSource]="pendingInspections" class="w-full">
+              <!-- Property Column -->
+              <ng-container matColumnDef="property">
+                <th mat-header-cell *matHeaderCellDef>Property</th>
+                <td mat-cell *matCellDef="let inspection" class="font-medium">
+                  {{ inspection.propertyAddress }}
+                </td>
+              </ng-container>
+
+              <!-- Scheduled Date Column -->
+              <ng-container matColumnDef="scheduledDate">
+                <th mat-header-cell *matHeaderCellDef>Scheduled</th>
+                <td mat-cell *matCellDef="let inspection">
+                  {{ inspection.scheduledDate | date:'short' }}
+                </td>
+              </ng-container>
+
+              <!-- Inspector Column -->
+              <ng-container matColumnDef="inspector">
+                <th mat-header-cell *matHeaderCellDef>Inspector</th>
+                <td mat-cell *matCellDef="let inspection">
+                  {{ inspection.inspector }}
+                </td>
+              </ng-container>
+
+              <!-- Type Column -->
+              <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef>Type</th>
+                <td mat-cell *matCellDef="let inspection">
+                  <mat-chip class="text-xs">{{ inspection.type }}</mat-chip>
+                </td>
+              </ng-container>
+
+              <!-- Priority Column -->
+              <ng-container matColumnDef="priority">
+                <th mat-header-cell *matHeaderCellDef>Priority</th>
+                <td mat-cell *matCellDef="let inspection">
+                  <mat-chip [color]="getPriorityColor(inspection.priority)" class="text-xs">
+                    {{ inspection.priority | uppercase }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <!-- Status Column -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let inspection">
+                  <mat-chip [color]="getStatusColor(inspection.status)" class="text-xs">
+                    {{ inspection.status | titlecase }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let inspection">
+                  <button mat-icon-button [matMenuTriggerFor]="menu">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="viewInspection(inspection)">
+                      <mat-icon>visibility</mat-icon>
+                      <span>View</span>
+                    </button>
+                    <button mat-menu-item (click)="editInspection(inspection)">
+                      <mat-icon>edit</mat-icon>
+                      <span>Edit</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

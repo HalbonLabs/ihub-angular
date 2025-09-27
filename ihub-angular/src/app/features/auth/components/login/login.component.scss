@@ -1,0 +1,32 @@
+.auth-card {
+  @apply shadow-xl rounded-lg;
+  max-width: 100%;
+  padding: 2rem;
+  
+  mat-card-header {
+    @apply block;
+    padding: 0;
+  }
+  
+  mat-form-field {
+    @apply mb-2;
+  }
+  
+  .mat-mdc-form-field {
+    .mdc-text-field--outlined {
+      @apply transition-all duration-200;
+      
+      &:hover {
+        @apply border-primary-200;
+      }
+    }
+  }
+  
+  .mat-mdc-raised-button:not([disabled]) {
+    @apply transition-all duration-200 transform;
+    
+    &:hover {
+      @apply shadow-lg -translate-y-0.5;
+    }
+  }
+}

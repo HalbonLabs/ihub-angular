@@ -1,0 +1,251 @@
+<mat-card class="inspection-detail-card animate-fade-in" *ngIf="inspection && !loading">
+  <mat-card-header class="mb-6">
+    <div class="flex justify-between items-start">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">{{ inspection.propertyAddress }}</h1>
+        <p class="text-sm text-gray-600 mt-1">
+          {{ formatType(inspection.type) }} Inspection • Client: {{ inspection.clientName }}
+        </p>
+      </div>
+      <div class="flex space-x-2">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="editInspection()">
+          <mat-icon>edit</mat-icon>
+          Edit
+        </button>
+        <button
+          mat-stroked-button
+          color="warn"
+          (click)="deleteInspection()">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      </div>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <mat-tab-group>
+      <!-- Overview Tab -->
+      <mat-tab label="Overview">
+        <div class="tab-content">
+          <!-- Status and Priority -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="status-card">
+              <div class="flex items-center space-x-2">
+                <mat-icon [style.color]="getStatusColor(inspection.status)">radio_button_checked</mat-icon>
+                <span class="font-medium">{{ formatStatus(inspection.status) }}</span>
+              </div>
+              <p class="text-sm text-gray-600">Status</p>
+            </div>
+
+            <div class="status-card">
+              <mat-chip [color]="getPriorityColor(inspection.priority)" selected>
+                {{ inspection.priority.toUpperCase() }}
+              </mat-chip>
+              <p class="text-sm text-gray-600">Priority</p>
+            </div>
+
+            <div class="status-card">
+              <div class="text-lg font-semibold text-gray-900">
+                {{ inspection.referenceNumber }}
+              </div>
+              <p class="text-sm text-gray-600">Reference #</p>
+            </div>
+          </div>
+
+          <!-- Key Details -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="detail-section">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Inspection Details</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Scheduled Date:</span>
+                  <span class="font-medium">{{ formatDate(inspection.scheduledDate) }}</span>
+                </div>
+                <div class="flex justify-between" *ngIf="inspection.completedDate">
+                  <span class="text-gray-600">Completed Date:</span>
+                  <span class="font-medium">{{ formatDate(inspection.completedDate) }}</span>
+                </div>
+                <div class="flex justify-between" *ngIf="inspection.estimatedDuration">
+                  <span class="text-gray-600">Estimated Duration:</span>
+                  <span class="font-medium">{{ inspection.estimatedDuration }} minutes</span>
+                </div>
+                <div class="flex justify-between" *ngIf="inspection.actualDuration">
+                  <span class="text-gray-600">Actual Duration:</span>
+                  <span class="font-medium">{{ inspection.actualDuration }} minutes</span>
+                </div>
+                <div class="flex justify-between" *ngIf="inspection.inspectorName">
+                  <span class="text-gray-600">Inspector:</span>
+                  <span class="font-medium">{{ inspection.inspectorName }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Client Information</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Name:</span>
+                  <span class="font-medium">{{ inspection.clientName }}</span>
+                </div>
+                <div class="flex justify-between" *ngIf="inspection.clientEmail">
+                  <span class="text-gray-600">Email:</span>
+                  <span class="font-medium">{{ inspection.clientEmail }}</span>
+                </div>
+                <div class="flex justify-between" *ngIf="inspection.clientPhone">
+                  <span class="text-gray-600">Phone:</span>
+                  <span class="font-medium">{{ inspection.clientPhone }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">Payment Status:</span>
+                  <mat-chip [color]="inspection.isPaid ? 'primary' : 'warn'" selected>
+                    {{ inspection.isPaid ? 'Paid' : 'Pending' }}
+                  </mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Actions -->
+          <div class="status-actions" *ngIf="getStatusActions().length > 0">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Update Status</h3>
+            <div class="flex flex-wrap gap-2">
+              <button
+                *ngFor="let action of getStatusActions()"
+                mat-raised-button
+                [color]="action.color"
+                (click)="updateStatus(action.status)">
+                {{ action.label }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="notes-section" *ngIf="inspection.notes">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Notes</h3>
+            <p class="text-gray-700 bg-gray-50 p-4 rounded-lg">{{ inspection.notes }}</p>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Measures Tab -->
+      <mat-tab label="Inspection Measures">
+        <div class="tab-content">
+          <div class="measures-grid" *ngIf="inspection.measures && inspection.measures.length > 0">
+            <div *ngFor="let measure of inspection.measures; trackBy: trackByMeasureId"
+                 class="measure-card">
+              <div class="measure-header">
+                <h4 class="font-semibold text-gray-900">{{ measure.name }}</h4>
+                <span class="text-sm text-gray-600">{{ measure.category }}</span>
+              </div>
+              <p class="text-sm text-gray-700 mb-2">{{ measure.description }}</p>
+              <div class="measure-value" *ngIf="measure.value">
+                <span class="font-medium">Value: {{ measure.value }}{{ measure.unit }}</span>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!inspection.measures || inspection.measures.length === 0" class="text-center py-8">
+            <mat-icon class="text-4xl text-gray-300 mb-4">assignment</mat-icon>
+            <p class="text-gray-600">No inspection measures defined yet.</p>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Defects Tab -->
+      <mat-tab label="Defects & Issues">
+        <div class="tab-content">
+          <div class="defects-list" *ngIf="inspection.defects && inspection.defects.length > 0">
+            <div *ngFor="let defect of inspection.defects; trackBy: trackByDefectId"
+                 class="defect-card">
+              <div class="defect-header">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h4 class="font-semibold text-gray-900">{{ defect.category }}</h4>
+                    <p class="text-sm text-gray-600">{{ defect.description }}</p>
+                  </div>
+                  <mat-chip [color]="getPriorityColor(defect.severity)" selected>
+                    {{ defect.severity.toUpperCase() }}
+                  </mat-chip>
+                </div>
+              </div>
+              <div class="defect-details">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div *ngIf="defect.location">
+                    <span class="text-gray-600">Location:</span>
+                    <span class="font-medium ml-1">{{ defect.location }}</span>
+                  </div>
+                  <div *ngIf="defect.estimatedRepairCost">
+                    <span class="text-gray-600">Est. Cost:</span>
+                    <span class="font-medium ml-1">${{ defect.estimatedRepairCost }}</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-600">Status:</span>
+                    <mat-chip [color]="defect.status === 'resolved' ? 'primary' : 'warn'" selected class="ml-1">
+                      {{ defect.status.replace('_', ' ').toUpperCase() }}
+                    </mat-chip>
+                  </div>
+                  <div *ngIf="defect.resolutionNotes">
+                    <span class="text-gray-600">Resolution:</span>
+                    <span class="font-medium ml-1">{{ defect.resolutionNotes }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!inspection.defects || inspection.defects.length === 0" class="text-center py-8">
+            <mat-icon class="text-4xl text-green-300 mb-4">check_circle</mat-icon>
+            <p class="text-gray-600">No defects or issues found during inspection.</p>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Files Tab -->
+      <mat-tab label="Files & Photos">
+        <div class="tab-content">
+          <div class="files-grid" *ngIf="inspection.files && inspection.files.length > 0">
+            <div *ngFor="let file of inspection.files; trackBy: trackByFileId"
+                 class="file-card">
+              <div class="file-icon">
+                <mat-icon>{{ getFileIcon(file.mimeType) }}</mat-icon>
+              </div>
+              <div class="file-info">
+                <h4 class="font-medium text-gray-900">{{ file.filename }}</h4>
+                <p class="text-sm text-gray-600">{{ formatFileSize(file.fileSize) }}</p>
+                <p class="text-xs text-gray-500">{{ formatDate(file.uploadedAt) }}</p>
+              </div>
+              <div class="file-actions">
+                <button mat-icon-button [matTooltip]="'Download file'">
+                  <mat-icon>download</mat-icon>
+                </button>
+                <button mat-icon-button [matTooltip]="'View file'">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!inspection.files || inspection.files.length === 0" class="text-center py-8">
+            <mat-icon class="text-4xl text-gray-300 mb-4">photo_library</mat-icon>
+            <p class="text-gray-600">No files or photos uploaded yet.</p>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+
+  <!-- Loading State -->
+  <mat-card-content *ngIf="loading" class="text-center py-12">
+    <mat-spinner diameter="40" class="mx-auto mb-4"></mat-spinner>
+    <p class="text-gray-600">Loading inspection details...</p>
+  </mat-card-content>
+
+  <!-- Back Button -->
+  <div class="mt-6">
+    <button mat-stroked-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Inspections
+    </button>
+  </div>
+</mat-card>

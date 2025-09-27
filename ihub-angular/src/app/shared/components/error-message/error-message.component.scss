@@ -1,0 +1,82 @@
+.error-message-card {
+  max-width: 600px;
+  margin: 20px auto;
+  
+  mat-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    
+    .error-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+    
+    .error-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin: 0;
+      
+      .error-code {
+        font-size: 14px;
+        font-weight: normal;
+        color: var(--mat-secondary-text);
+        margin-left: 8px;
+      }
+    }
+  }
+  
+  mat-card-content {
+    .error-text {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mat-foreground);
+      margin: 0 0 16px 0;
+    }
+    
+    .error-details {
+      margin-top: 16px;
+      
+      details {
+        border: 1px solid var(--mat-divider);
+        border-radius: 4px;
+        padding: 8px;
+        
+        summary {
+          cursor: pointer;
+          font-weight: 500;
+          font-size: 13px;
+          color: var(--mat-secondary-text);
+          padding: 4px;
+          
+          &:hover {
+            color: var(--mat-primary);
+          }
+        }
+        
+        pre {
+          margin: 12px 0 0 0;
+          padding: 12px;
+          background-color: var(--mat-background);
+          border-radius: 4px;
+          font-size: 12px;
+          overflow-x: auto;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+        }
+      }
+    }
+  }
+  
+  mat-card-actions {
+    padding: 8px 16px;
+    
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}

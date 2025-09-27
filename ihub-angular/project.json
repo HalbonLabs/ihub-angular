@@ -1,0 +1,114 @@
+{
+  "name": "ihub-angular",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "ihub-angular/src",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/ihub-angular",
+        "index": "ihub-angular/src/index.html",
+        "main": "ihub-angular/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "ihub-angular/tsconfig.app.json",
+        "assets": [
+          "ihub-angular/src/favicon.ico",
+          "ihub-angular/src/assets"
+        ],
+        "styles": ["ihub-angular/src/styles.scss"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "ihub-angular:build:production"
+        },
+        "development": {
+          "buildTarget": "ihub-angular:build:development"
+        }
+      },
+      "defaultConfiguration": "development",
+      "options": {
+        "port": 4200
+      }
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "ihub-angular:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@angular-devkit/build-angular:karma",
+      "options": {
+        "polyfills": ["zone.js", "zone.js/testing"],
+        "tsConfig": "ihub-angular/tsconfig.spec.json",
+        "assets": [
+          "ihub-angular/src/favicon.ico",
+          "ihub-angular/src/assets"
+        ],
+        "styles": ["ihub-angular/src/styles.scss"],
+        "scripts": []
+      }
+    },
+    "serve-ssr": {
+      "executor": "@angular-devkit/build-angular:ssr-dev-server",
+      "configurations": {
+        "development": {
+          "buildTarget": "ihub-angular:build-ssr:development",
+          "serverTarget": "ihub-angular:serve-ssr:development"
+        },
+        "production": {
+          "buildTarget": "ihub-angular:build-ssr:production",
+          "serverTarget": "ihub-angular:serve-ssr:production"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "prerender": {
+      "executor": "@angular-devkit/build-angular:prerender",
+      "options": {
+        "buildTarget": "ihub-angular:build:production",
+        "serverTarget": "ihub-angular:server:production",
+        "routes": ["/"]
+      },
+      "configurations": {
+        "production": {}
+      }
+    }
+  }
+}

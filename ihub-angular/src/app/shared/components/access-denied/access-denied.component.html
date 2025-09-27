@@ -1,0 +1,24 @@
+<div class="access-denied-container">
+  <div class="access-denied-content">
+    <div class="error-icon-wrapper">
+      <mat-icon class="error-icon">lock</mat-icon>
+    </div>
+    <h1 class="error-title">Access Denied</h1>
+    <p class="error-message">
+      You don't have permission to access this page.
+    </p>
+    <p class="error-submessage">
+      Please contact your administrator if you believe this is an error.
+    </p>
+    <div class="error-actions">
+      <a routerLink="/dashboard" mat-raised-button color="primary">
+        <mat-icon>home</mat-icon>
+        Go to Dashboard
+      </a>
+      <button mat-button color="accent" onclick="history.back()">
+        <mat-icon>arrow_back</mat-icon>
+        Go Back
+      </button>
+    </div>
+  </div>
+</div>
