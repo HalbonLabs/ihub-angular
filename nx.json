@@ -6,7 +6,10 @@
   "nxCloudAccessToken": "YOUR_ACCESS_TOKEN_HERE",
   "defaultProject": "ihub-angular",
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
@@ -20,18 +23,35 @@
   "targetDefaults": {
     "build": {
       "cache": true,
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"],
-      "outputs": ["{workspaceRoot}/dist/{projectName}"]
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "outputs": [
+        "{workspaceRoot}/dist/{projectName}"
+      ]
     },
     "test": {
       "cache": true,
-      "inputs": ["default", "^production", "{workspaceRoot}/karma.conf.js"],
-      "outputs": ["{workspaceRoot}/coverage/{projectName}"]
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/karma.conf.js"
+      ],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectName}"
+      ]
     },
     "lint": {
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/.eslintrc.json", "{workspaceRoot}/.eslintrc.js"],
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/.eslintrc.js"
+      ],
       "outputs": []
     },
     "serve": {
@@ -39,8 +59,13 @@
     },
     "e2e": {
       "cache": true,
-      "inputs": ["default", "^production"],
-      "outputs": ["{workspaceRoot}/dist/cypress/{projectName}"]
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "outputs": [
+        "{workspaceRoot}/dist/cypress/{projectName}"
+      ]
     }
   },
   "generators": {
@@ -57,5 +82,6 @@
     "@nx/angular:component": {
       "style": "scss"
     }
-  }
+  },
+  "nxCloudId": "68d73db093df4b0983d2fe69"
 }
