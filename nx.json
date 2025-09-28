@@ -3,7 +3,7 @@
   "installation": {
     "version": "21.5.3"
   },
-  "nxCloudAccessToken": "YOUR_ACCESS_TOKEN_HERE",
+
   "defaultProject": "ihub-angular",
   "namedInputs": {
     "default": [
