@@ -1,10 +1,20 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { ChartComponent, ChartData } from '../chart/chart.component';
+// import { ChartComponent, ChartData } from '../chart/chart.component';
+
+export interface ChartData {
+  labels: string[];
+  datasets: Array<{
+    label: string;
+    data: number[];
+    backgroundColor?: string | string[];
+    borderColor?: string | string[];
+    borderWidth?: number;
+    fill?: boolean;
+    tension?: number;
+    [key: string]: any;
+  }>;
+}
 
 export interface WidgetConfig {
   id: string;
@@ -23,49 +33,51 @@ export interface WidgetConfig {
   selector: 'app-dashboard-widget',
   standalone: true,
   imports: [
-    CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    ChartComponent
+    CommonModule
   ],
   template: `
-    <mat-card class="widget-card" [ngClass]="'widget-' + config.size">
-      <mat-card-header class="widget-header">
-        <mat-card-title>{{ config.title }}</mat-card-title>
-        <div class="widget-actions">
-          <button mat-icon-button [matMenuTriggerFor]="widgetMenu" *ngIf="hasActions()">
-            <mat-icon>more_vert</mat-icon>
-          </button>
+    <div class="widget-card" [ngClass]="'widget-' + config.size">
+      <div class="widget-header">
+        <h3 class="widget-title">{{ config.title }}</h3>
+        <div class="widget-actions" *ngIf="hasActions()">
+          <button class="btn-icon" (click)="showMenu = !showMenu">⋮</button>
+          <div class="widget-menu" *ngIf="showMenu">
+            <button class="menu-item" (click)="onRefresh(); showMenu = false" *ngIf="config.refreshable">
+              🔄 Refresh
+            </button>
+            <button class="menu-item" (click)="onConfigure(); showMenu = false" *ngIf="config.configurable">
+              ⚙️ Configure
+            </button>
+            <button class="menu-item" (click)="onRemove(); showMenu = false" *ngIf="config.removable">
+              🗑️ Remove
+            </button>
+          </div>
         </div>
-      </mat-card-header>
+      </div>
 
-      <mat-card-content class="widget-content">
+      <div class="widget-content">
         <!-- Metric Widget -->
         <div *ngIf="config.type === 'metric'" class="metric-widget">
           <div class="metric-value">{{ config.data?.value || 0 }}</div>
           <div class="metric-label">{{ config.data?.label || 'Metric' }}</div>
           <div class="metric-change" [ngClass]="config.data?.changeType">
-            <i [class]="getTrendIcon(config.data?.changeType)"></i>
+            <span [innerHTML]="getTrendIcon(config.data?.changeType)"></span>
             {{ config.data?.change || '0%' }}
           </div>
         </div>
 
         <!-- Chart Widget -->
         <div *ngIf="config.type === 'chart'" class="chart-widget">
-          <app-chart
-            [type]="config.chartType || 'line'"
-            [data]="config.chartData!"
-            *ngIf="config.chartData">
-          </app-chart>
+          <div class="chart-placeholder">
+            📊 Chart: {{ config.chartType || 'line' }}
+          </div>
         </div>
 
         <!-- List Widget -->
         <div *ngIf="config.type === 'list'" class="list-widget">
           <div class="list-item" *ngFor="let item of config.data?.items">
             <div class="item-icon" [ngStyle]="{'background-color': item.color}">
-              <i [class]="item.icon"></i>
+              <span [innerHTML]="item.icon"></span>
             </div>
             <div class="item-content">
               <div class="item-title">{{ item.title }}</div>
@@ -78,7 +90,7 @@ export interface WidgetConfig {
         <!-- Grid Widget -->
         <div *ngIf="config.type === 'grid'" class="grid-widget">
           <div class="grid-item" *ngFor="let item of config.data?.items" [ngClass]="item.class">
-            <i [class]="item.icon"></i>
+            <span [innerHTML]="item.icon"></span>
             <span class="grid-value">{{ item.value }}</span>
             <span class="grid-label">{{ item.label }}</span>
           </div>
@@ -86,24 +98,8 @@ export interface WidgetConfig {
 
         <!-- Custom Widget Content -->
         <ng-content *ngIf="config.type === 'custom'"></ng-content>
-      </mat-card-content>
-
-      <!-- Widget Menu -->
-      <mat-menu #widgetMenu="matMenu">
-        <button mat-menu-item (click)="onRefresh()" *ngIf="config.refreshable">
-          <mat-icon>refresh</mat-icon>
-          <span>Refresh</span>
-        </button>
-        <button mat-menu-item (click)="onConfigure()" *ngIf="config.configurable">
-          <mat-icon>settings</mat-icon>
-          <span>Configure</span>
-        </button>
-        <button mat-menu-item (click)="onRemove()" *ngIf="config.removable">
-          <mat-icon>delete</mat-icon>
-          <span>Remove</span>
-        </button>
-      </mat-menu>
-    </mat-card>
+      </div>
+    </div>
   `,
   styles: [`
     .widget-card {
@@ -298,6 +294,8 @@ export class DashboardWidgetComponent implements OnInit {
   @Output() refresh = new EventEmitter<string>();
   @Output() configure = new EventEmitter<string>();
   @Output() remove = new EventEmitter<string>();
+  
+  showMenu = false;
 
   ngOnInit(): void {
     // Component initialization
@@ -309,9 +307,9 @@ export class DashboardWidgetComponent implements OnInit {
 
   getTrendIcon(changeType: string): string {
     switch (changeType) {
-      case 'increase': return 'fas fa-arrow-up';
-      case 'decrease': return 'fas fa-arrow-down';
-      default: return 'fas fa-minus';
+      case 'increase': return '↗️';
+      case 'decrease': return '↘️';
+      default: return '➖';
     }
   }
 
