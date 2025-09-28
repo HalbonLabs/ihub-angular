@@ -6,44 +6,47 @@
   "sourceRoot": "ihub-angular/src",
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:browser",
+      "executor": "@angular-devkit/build-angular:application",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/ihub-angular",
         "index": "ihub-angular/src/index.html",
-        "main": "ihub-angular/src/main.ts",
+        "browser": "ihub-angular/src/main.ts",
         "polyfills": ["zone.js"],
         "tsConfig": "ihub-angular/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
         "assets": [
           "ihub-angular/src/favicon.ico",
           "ihub-angular/src/assets"
         ],
         "styles": ["ihub-angular/src/styles.scss"],
-        "scripts": []
+        "scripts": [],
+        "server": "ihub-angular/src/main.server.ts",
+        "prerender": true,
+        "ssr": {
+          "entry": "server.ts"
+        }
       },
       "configurations": {
         "production": {
           "budgets": [
             {
               "type": "initial",
-              "maximumWarning": "500kb",
-              "maximumError": "1mb"
+              "maximumWarning": "2mb",
+              "maximumError": "5mb"
             },
             {
               "type": "anyComponentStyle",
-              "maximumWarning": "2kb",
-              "maximumError": "4kb"
+              "maximumWarning": "6kb",
+              "maximumError": "12kb"
             }
           ],
           "outputHashing": "all"
         },
         "development": {
-          "buildOptimizer": false,
           "optimization": false,
-          "vendorChunk": true,
           "extractLicenses": false,
-          "sourceMap": true,
-          "namedChunks": true
+          "sourceMap": true
         }
       },
       "defaultConfiguration": "production"
