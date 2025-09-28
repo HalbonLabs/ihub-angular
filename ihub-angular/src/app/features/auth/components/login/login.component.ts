@@ -2,15 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDividerModule } from '@angular/material/divider';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
 import { emailValidator, getErrorMessage } from '../../validators/auth.validators';
@@ -21,16 +12,7 @@ import { emailValidator, getErrorMessage } from '../../validators/auth.validator
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatDividerModule
+    RouterLink
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
@@ -46,8 +28,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -101,16 +82,8 @@ export class LoginComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          this.snackBar.open(
-            `Welcome back, ${response.user.fullName || response.user.email}!`,
-            'Close',
-            {
-              duration: 3000,
-              panelClass: ['success-snackbar'],
-              horizontalPosition: 'end',
-              verticalPosition: 'bottom'
-            }
-          );
+          // Success message (simplified)
+          alert(`Welcome back, ${response.user.fullName || response.user.email}!`);
 
           // Navigate to return URL or dashboard
           this.router.navigateByUrl(this.returnUrl, { replaceUrl: true });
@@ -124,12 +97,8 @@ export class LoginComponent implements OnInit, OnDestroy {
             errorMessage = error.message;
           }
 
-          this.snackBar.open(errorMessage, 'Close', {
-            duration: 5000,
-            panelClass: ['error-snackbar'],
-            horizontalPosition: 'end',
-            verticalPosition: 'bottom'
-          });
+          // Error message (simplified)
+          alert(errorMessage);
         },
         complete: () => {
           this.loading = false;
