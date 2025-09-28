@@ -1,13 +1,14 @@
 import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatBadgeModule } from '@angular/material/badge';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDividerModule } from '@angular/material/divider';
+// Temporarily disabled Material imports for build compatibility
+// import { MatSidenavModule } from '@angular/material/sidenav';
+// import { MatListModule } from '@angular/material/list';
+// import { MatIconModule } from '@angular/material/icon';
+// import { MatBadgeModule } from '@angular/material/badge';
+// import { MatExpansionModule } from '@angular/material/expansion';
+// import { MatTooltipModule } from '@angular/material/tooltip';
+// import { MatDividerModule } from '@angular/material/divider';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { User, UserRole } from '../../../core/models/auth.model';
@@ -20,14 +21,15 @@ import { environment } from '../../../../environments/environment';
   imports: [
     CommonModule,
     RouterLink,
-    RouterLinkActive,
-    MatSidenavModule,
-    MatListModule,
-    MatIconModule,
-    MatBadgeModule,
-    MatExpansionModule,
-    MatTooltipModule,
-    MatDividerModule
+    RouterLinkActive
+    // Temporarily disabled Material modules for build compatibility
+    // MatSidenavModule,
+    // MatListModule,
+    // MatIconModule,
+    // MatBadgeModule,
+    // MatExpansionModule,
+    // MatTooltipModule,
+    // MatDividerModule
   ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'

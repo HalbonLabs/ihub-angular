@@ -450,7 +450,7 @@ interface RecentActivity {
       </div>
     </div>
   `,
-  styleUrls: ['./homepage.component.scss']
+  styleUrls: ['./homepage.component.simple.scss']
 })
 export class HomepageComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('activityList', { static: false }) activityList?: ElementRef;
