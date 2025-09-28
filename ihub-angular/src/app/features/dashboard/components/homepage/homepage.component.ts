@@ -1,19 +1,6 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatBadgeModule } from '@angular/material/badge';
-import { MatRippleModule } from '@angular/material/core';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate, query, stagger, state } from '@angular/animations';
 import { Subject, interval, BehaviorSubject } from 'rxjs';
@@ -74,20 +61,7 @@ interface RecentActivity {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatGridListModule,
-    MatProgressBarModule,
-    MatChipsModule,
-    MatBadgeModule,
-    MatRippleModule,
-    MatTooltipModule,
-    MatTabsModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    MatSlideToggleModule
+    FormsModule
   ],
   animations: [
     trigger('fadeInUp', [
@@ -126,52 +100,31 @@ interface RecentActivity {
   ],
   template: `
     <div class="dashboard-container" [class.dark-theme]="themeConfig.isDarkMode">
-      <!-- Animated Background -->
-      <div class="animated-background">
-        <div class="floating-shapes">
-          <div class="shape shape-1"></div>
-          <div class="shape shape-2"></div>
-          <div class="shape shape-3"></div>
-          <div class="shape shape-4"></div>
-        </div>
-      </div>
-
-      <!-- Header Section with Enhanced Animations -->
-      <div class="dashboard-header" @slideIn>
+      <!-- Header Section -->
+      <div class="dashboard-header">
         <div class="header-content">
-          <div class="title-section" @bounceIn>
+          <div class="title-section">
             <h1>
               <i class="fas fa-chart-line header-icon"></i>
               InspectHub
               <span class="version-badge">v2.0</span>
             </h1>
             <p>Advanced inspection management platform</p>
-            <div class="breadcrumb-nav">
-              <span><i class="fas fa-home"></i> Dashboard</span>
-              <span class="separator">/</span>
-              <span class="current">Overview</span>
-            </div>
           </div>
           <div class="header-controls">
-            <mat-slide-toggle
-              [(ngModel)]="themeConfig.isDarkMode"
-              (change)="toggleTheme($event)"
-              class="theme-toggle"
-              matTooltip="Toggle Dark Mode">
+            <button type="button" class="theme-toggle" (click)="toggleTheme()">
               <i class="fas fa-moon" *ngIf="!themeConfig.isDarkMode"></i>
               <i class="fas fa-sun" *ngIf="themeConfig.isDarkMode"></i>
-            </mat-slide-toggle>
-            <button mat-icon-button matTooltip="Notifications" [matBadge]="unreadNotifications" matBadgeColor="warn">
-              <i class="fas fa-bell"></i>
             </button>
-            <button mat-icon-button matTooltip="Settings">
-              <i class="fas fa-cog"></i>
+            <button type="button" class="notification-btn">
+              <i class="fas fa-bell"></i>
+              <span class="badge" *ngIf="unreadNotifications">{{unreadNotifications}}</span>
             </button>
           </div>
         </div>
 
-        <div class="header-stats" @fadeInUp>
-          <div class="stat-item" *ngFor="let stat of headerStats; trackBy: trackByStat" @scaleIn>
+        <div class="header-stats">
+          <div class="stat-item" *ngFor="let stat of headerStats; trackBy: trackByStat">
             <div class="stat-icon">
               <i [class]="stat.icon"></i>
             </div>
@@ -187,164 +140,144 @@ interface RecentActivity {
         </div>
       </div>
 
-      <!-- Enhanced Quick Actions Grid -->
+      <!-- Quick Actions Grid -->
       <div class="actions-section">
-        <div class="section-header" @slideIn>
+        <div class="section-header">
           <h2><i class="fas fa-rocket"></i> Quick Actions</h2>
           <div class="section-controls">
-            <mat-form-field appearance="outline" class="filter-field">
-              <mat-select [(value)]="selectedCategory" placeholder="Filter by category">
-                <mat-option value="all">All Categories</mat-option>
-                <mat-option value="inspection">Inspections</mat-option>
-                <mat-option value="reports">Reports</mat-option>
-                <mat-option value="admin">Administration</mat-option>
-              </mat-select>
-            </mat-form-field>
+            <select [(ngModel)]="selectedCategory" class="filter-select">
+              <option value="all">All Categories</option>
+              <option value="inspection">Inspections</option>
+              <option value="reports">Reports</option>
+              <option value="admin">Administration</option>
+            </select>
           </div>
         </div>
 
-        <div class="actions-grid" @fadeInUp>
-          <mat-card
+        <div class="actions-grid">
+          <div
             *ngFor="let action of filteredActions; let i = index; trackBy: trackByAction"
             class="action-card glassmorphism"
             [ngClass]="'action-' + action.color"
-            [@cardHover]="action.hoverState || 'default'"
-            (mouseenter)="onCardHover(action, true)"
-            (mouseleave)="onCardHover(action, false)"
             (click)="navigateToAction(action.route)"
-            matRipple
-            [matRippleColor]="'rgba(255,255,255,0.2)'"
-            [matTooltip]="action.description"
-            matTooltipPosition="above">
+            [title]="action.description">
 
-            <mat-card-content>
-              <div class="action-header">
-                <div class="action-icon-wrapper" [ngClass]="'icon-wrapper-' + action.color">
-                  <i [class]="action.icon"></i>
-                  <div class="icon-pulse" *ngIf="action.badge"></div>
-                </div>
-                <div class="action-badge pulse-animation" *ngIf="action.badge" [matBadge]="action.badge" matBadgeColor="warn">
+            <div class="action-header">
+              <div class="action-icon-wrapper" [ngClass]="'icon-wrapper-' + action.color">
+                <i [class]="action.icon"></i>
+              </div>
+              <div class="action-badge" *ngIf="action.badge">
+                {{ action.badge }}
+              </div>
+            </div>
+
+            <div class="action-content">
+              <h3>{{ action.title }}</h3>
+              <p>{{ action.description }}</p>
+
+              <div class="action-footer" *ngIf="action.stats">
+                <div class="mini-stats">
+                  <span class="mini-stat" *ngFor="let stat of action.stats">
+                    <i [class]="stat.icon"></i>
+                    {{ stat.value }}
+                  </span>
                 </div>
               </div>
-
-              <div class="action-content">
-                <h3>{{ action.title }}</h3>
-                <p>{{ action.description }}</p>
-
-                <div class="action-footer" *ngIf="action.stats">
-                  <div class="mini-stats">
-                    <span class="mini-stat" *ngFor="let stat of action.stats">
-                      <i [class]="stat.icon"></i>
-                      {{ stat.value }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="action-overlay"></div>
-            </mat-card-content>
-          </mat-card>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Enhanced Metrics Dashboard -->
+      <!-- Metrics Dashboard -->
       <div class="metrics-section">
-        <div class="metrics-header" @slideIn>
+        <div class="metrics-header">
           <h2><i class="fas fa-analytics"></i> Performance Analytics</h2>
           <div class="metrics-controls">
-            <mat-tab-group [(selectedIndex)]="selectedMetricTab" class="metrics-tabs">
-              <mat-tab label="Overview"></mat-tab>
-              <mat-tab label="Trends"></mat-tab>
-              <mat-tab label="Forecasts"></mat-tab>
-            </mat-tab-group>
-            <button mat-stroked-button color="primary" (click)="exportMetrics()">
+            <div class="tabs">
+              <button 
+                type="button"
+                class="tab-btn"
+                [class.active]="selectedMetricTab === 0"
+                (click)="selectedMetricTab = 0">Overview</button>
+              <button 
+                type="button"
+                class="tab-btn"
+                [class.active]="selectedMetricTab === 1"
+                (click)="selectedMetricTab = 1">Trends</button>
+              <button 
+                type="button"
+                class="tab-btn"
+                [class.active]="selectedMetricTab === 2"
+                (click)="selectedMetricTab = 2">Forecasts</button>
+            </div>
+            <button type="button" class="export-btn" (click)="exportMetrics()">
               <i class="fas fa-download"></i> Export
             </button>
           </div>
         </div>
 
-        <div class="metrics-grid" @fadeInUp>
-          <mat-card
+        <div class="metrics-grid">
+          <div
             *ngFor="let metric of dashboardMetrics; let i = index; trackBy: trackByMetric"
             class="metric-card glassmorphism"
-            [ngClass]="'metric-' + metric.color"
-            @scaleIn>
+            [ngClass]="'metric-' + metric.color">
 
-            <mat-card-content>
-              <div class="metric-header">
-                <div class="metric-icon-wrapper">
-                  <i [class]="metric.icon"></i>
-                </div>
-                <div class="metric-change" [ngClass]="metric.changeType">
-                  <i [class]="getTrendIcon(metric.changeType)"></i>
-                  {{ metric.change }}
-                </div>
+            <div class="metric-header">
+              <div class="metric-icon-wrapper">
+                <i [class]="metric.icon"></i>
               </div>
-
-              <div class="metric-body">
-                <div class="metric-value">
-                  {{ metric.displayValue || 0 }}
-                </div>
-                <div class="metric-label">{{ metric.label }}</div>
-                <div class="metric-description">{{ metric.description }}</div>
+              <div class="metric-change" [ngClass]="metric.changeType">
+                <i [class]="getTrendIcon(metric.changeType)"></i>
+                {{ metric.change }}
               </div>
+            </div>
 
-              <div class="metric-footer">
-                <div class="metric-progress">
-                  <mat-progress-bar
-                    mode="determinate"
-                    [value]="getMetricProgress(metric)"
-                    [color]="getProgressBarColor(metric.changeType)">
-                  </mat-progress-bar>
-                  <span class="progress-label">
-                    {{ getMetricProgress(metric) }}% of target
-                  </span>
-                </div>
-
-                <div class="metric-sparkline" *ngIf="metric.trend">
-                  <canvas #sparklineCanvas></canvas>
-                </div>
+            <div class="metric-body">
+              <div class="metric-value">
+                {{ metric.displayValue || 0 }}
               </div>
-            </mat-card-content>
-          </mat-card>
+              <div class="metric-label">{{ metric.label }}</div>
+              <div class="metric-description">{{ metric.description }}</div>
+            </div>
+
+            <div class="metric-footer">
+              <div class="metric-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="getMetricProgress(metric)"></div>
+                </div>
+                <span class="progress-label">
+                  {{ getMetricProgress(metric) }}% of target
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Enhanced Bottom Section -->
+      <!-- Bottom Section -->
       <div class="bottom-section">
-        <!-- Real-time Activity Feed -->
-        <mat-card class="activity-card glassmorphism" @slideIn>
-          <mat-card-header>
-            <div class="card-header-with-actions">
-              <div>
-                <mat-card-title>
-                  <i class="fas fa-activity"></i>
-                  Live Activity Feed
-                </mat-card-title>
-                <mat-card-subtitle>Real-time updates and notifications</mat-card-subtitle>
-              </div>
-              <div class="header-actions">
-                <button mat-icon-button matTooltip="Refresh" (click)="refreshActivity()">
-                  <i class="fas fa-sync-alt" [class.rotating]="isRefreshing"></i>
-                </button>
-                <button mat-icon-button matTooltip="Mark all as read">
-                  <i class="fas fa-check-double"></i>
-                </button>
-              </div>
+        <!-- Activity Feed -->
+        <div class="activity-card glassmorphism">
+          <div class="card-header">
+            <div>
+              <h3>
+                <i class="fas fa-activity"></i>
+                Live Activity Feed
+              </h3>
+              <p class="card-subtitle">Real-time updates and notifications</p>
             </div>
-          </mat-card-header>
-          <mat-card-content>
+            <div class="header-actions">
+              <button type="button" class="refresh-btn" (click)="refreshActivity()" [title]="'Refresh'">
+                <i class="fas fa-sync-alt" [class.rotating]="isRefreshing"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
             <div class="activity-list" #activityList>
               <div
                 *ngFor="let activity of recentActivities; let i = index; trackBy: trackByActivity"
                 class="activity-item"
-                [@fadeInUp]="activity"
                 [class.unread]="!activity.read">
-
-                <div class="activity-timeline">
-                  <div class="timeline-dot" [ngClass]="'timeline-' + activity.type"></div>
-                  <div class="timeline-line" *ngIf="i < recentActivities.length - 1"></div>
-                </div>
 
                 <div class="activity-icon" [ngClass]="'activity-' + activity.type">
                   <i [class]="activity.icon"></i>
@@ -363,45 +296,38 @@ interface RecentActivity {
                     </span>
                   </div>
                 </div>
-
-                <div class="activity-actions">
-                  <button mat-icon-button size="small" matTooltip="View details">
-                    <i class="fas fa-eye"></i>
-                  </button>
-                </div>
               </div>
             </div>
 
             <div class="activity-footer" *ngIf="recentActivities.length > 5">
-              <button mat-stroked-button (click)="loadMoreActivity()">
+              <button type="button" class="load-more-btn" (click)="loadMoreActivity()">
                 <i class="fas fa-chevron-down"></i>
                 Load More
               </button>
             </div>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
 
-        <!-- Enhanced Quick Stats with Real-time Updates -->
-        <mat-card class="quick-stats-card glassmorphism" @slideIn>
-          <mat-card-header>
-            <div class="card-header-with-actions">
-              <mat-card-title>
-                <i class="fas fa-chart-pie"></i>
-                System Overview
-              </mat-card-title>
-              <div class="header-actions">
-                <mat-slide-toggle [(ngModel)]="realTimeMode" matTooltip="Real-time updates">
-                  <i class="fas fa-broadcast-tower"></i>
-                </mat-slide-toggle>
-              </div>
+        <!-- Quick Stats -->
+        <div class="quick-stats-card glassmorphism">
+          <div class="card-header">
+            <h3>
+              <i class="fas fa-chart-pie"></i>
+              System Overview
+            </h3>
+            <div class="header-actions">
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="realTimeMode">
+                <span class="slider"></span>
+                <i class="fas fa-broadcast-tower"></i>
+              </label>
             </div>
-          </mat-card-header>
-          <mat-card-content>
+          </div>
+          <div class="card-content">
             <div class="enhanced-stats-grid">
               <div
                 *ngFor="let stat of quickStats; trackBy: trackByQuickStat"
-                class="enhanced-stat-item"
-                @scaleIn>
+                class="enhanced-stat-item">
 
                 <div class="stat-icon-wrapper" [ngClass]="stat.colorClass">
                   <i [class]="stat.icon"></i>
@@ -422,17 +348,15 @@ interface RecentActivity {
                   <div class="stat-subtitle">{{ stat.subtitle }}</div>
 
                   <div class="stat-progress" *ngIf="stat.progress !== undefined">
-                    <mat-progress-bar
-                      mode="determinate"
-                      [value]="stat.progress"
-                      [color]="stat.progressColor">
-                    </mat-progress-bar>
+                    <div class="progress-bar">
+                      <div class="progress-fill" [style.width.%]="stat.progress"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="stats-summary" @fadeInUp>
+            <div class="stats-summary">
               <div class="summary-item">
                 <span class="summary-label">System Health</span>
                 <div class="health-indicator excellent">
@@ -445,8 +369,8 @@ interface RecentActivity {
                 </div>
               </div>
             </div>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
       </div>
     </div>
   `,
@@ -787,8 +711,8 @@ export class HomepageComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // Theme methods
-  toggleTheme(event: any): void {
-    this.themeConfig.isDarkMode = event.checked;
+  toggleTheme(): void {
+    this.themeConfig.isDarkMode = !this.themeConfig.isDarkMode;
     document.body.classList.toggle('dark-theme', this.themeConfig.isDarkMode);
   }
 
