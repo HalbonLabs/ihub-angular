@@ -19,7 +19,7 @@ export const appConfig: ApplicationConfig = {
       routes,
       withPreloading(PreloadAllModules)
     ),
-    
+
     // HTTP client with interceptors
     provideHttpClient(
       withFetch(),
@@ -28,7 +28,7 @@ export const appConfig: ApplicationConfig = {
         errorInterceptor
       ])
     ),
-    
+
     // NgRx Store configuration (temporarily disabled)
     // provideStore(),
     // provideEffects(),
@@ -39,7 +39,7 @@ export const appConfig: ApplicationConfig = {
     //   trace: false,
     //   traceLimit: 75
     // }),
-    
+
     // Platform providers
     provideClientHydration(),
     provideAnimationsAsync()

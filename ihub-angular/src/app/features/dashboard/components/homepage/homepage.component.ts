@@ -194,17 +194,17 @@ interface RecentActivity {
           <h2><i class="fas fa-analytics"></i> Performance Analytics</h2>
           <div class="metrics-controls">
             <div class="tabs">
-              <button 
+              <button
                 type="button"
                 class="tab-btn"
                 [class.active]="selectedMetricTab === 0"
                 (click)="selectedMetricTab = 0">Overview</button>
-              <button 
+              <button
                 type="button"
                 class="tab-btn"
                 [class.active]="selectedMetricTab === 1"
                 (click)="selectedMetricTab = 1">Trends</button>
-              <button 
+              <button
                 type="button"
                 class="tab-btn"
                 [class.active]="selectedMetricTab === 2"

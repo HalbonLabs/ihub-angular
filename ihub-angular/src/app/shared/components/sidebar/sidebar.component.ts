@@ -36,14 +36,14 @@ import { environment } from '../../../../environments/environment';
 })
 export class SidebarComponent implements OnInit, OnDestroy {
   @Output() toggleSidebar = new EventEmitter<void>();
-  
+
   user: User | null = null;
   navigationItems: NavigationItem[] = [];
   appName = environment.appName;
   appVersion = environment.appVersion;
   isCollapsed = false;
   expandedItems: Set<string> = new Set();
-  
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -77,7 +77,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   toggleCollapse(): void {
     this.isCollapsed = !this.isCollapsed;
     this.toggleSidebar.emit();
-    
+
     // Clear expanded items when collapsing
     if (this.isCollapsed) {
       this.expandedItems.clear();
@@ -107,7 +107,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   getUserRoleLabel(): string {
     if (!this.user) return '';
-    
+
     switch (this.user.role) {
       case UserRole.ADMIN:
         return 'Administrator';
@@ -122,7 +122,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   getUserInitials(): string {
     if (!this.user) return '?';
-    
+
     const names = this.user.fullName.split(' ');
     if (names.length >= 2) {
       return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();

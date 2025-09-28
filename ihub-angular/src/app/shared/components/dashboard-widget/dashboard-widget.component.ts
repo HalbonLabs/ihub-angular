@@ -294,7 +294,7 @@ export class DashboardWidgetComponent implements OnInit {
   @Output() refresh = new EventEmitter<string>();
   @Output() configure = new EventEmitter<string>();
   @Output() remove = new EventEmitter<string>();
-  
+
   showMenu = false;
 
   ngOnInit(): void {

@@ -13,5 +13,5 @@ import { RouterModule } from '@angular/router';
   styleUrl: './access-denied.component.scss'
 })
 export class AccessDeniedComponent {
-  
+
 }

@@ -28,7 +28,7 @@ import {
           <i class="fas fa-arrow-left"></i> Back to List
         </button>
       </div>
-      
+
       <div class="content" *ngIf="inspection; else loadingTemplate">
         <div class="basic-info">
           <h2>{{inspection.title}}</h2>
@@ -37,14 +37,14 @@ import {
           <p>Location: {{inspection.location}}</p>
           <p *ngIf="inspection.description">Description: {{inspection.description}}</p>
         </div>
-        
+
         <div class="actions">
           <button type="button" class="btn primary" (click)="editInspection()">Edit</button>
           <button type="button" class="btn secondary" (click)="generateReport()">Generate Report</button>
           <button type="button" class="btn danger" (click)="deleteInspection()">Delete</button>
         </div>
       </div>
-      
+
       <ng-template #loadingTemplate>
         <div class="loading">
           <p>Loading inspection details...</p>
@@ -58,14 +58,14 @@ import {
       max-width: 800px;
       margin: 0 auto;
     }
-    
+
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 30px;
     }
-    
+
     .back-btn {
       padding: 8px 16px;
       background: #f0f0f0;
@@ -73,30 +73,30 @@ import {
       border-radius: 4px;
       cursor: pointer;
     }
-    
+
     .basic-info {
       background: #f9f9f9;
       padding: 20px;
       border-radius: 8px;
       margin-bottom: 20px;
     }
-    
+
     .actions {
       display: flex;
       gap: 10px;
     }
-    
+
     .btn {
       padding: 10px 20px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
     }
-    
+
     .btn.primary { background: #007bff; color: white; }
     .btn.secondary { background: #6c757d; color: white; }
     .btn.danger { background: #dc3545; color: white; }
-    
+
     .loading {
       text-align: center;
       padding: 50px;
