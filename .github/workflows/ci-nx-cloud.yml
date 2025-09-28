@@ -30,9 +30,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      # Start Nx Cloud CI run with task distribution (if token is configured)
+      # Start Nx Cloud CI run with task distribution (temporarily disabled)
       - name: Start Nx Cloud CI Run
-        run: npx nx-cloud start-ci-run --distribute-on="5 linux-medium-js" --stop-agents-after="e2e" || echo "Nx Cloud not configured, running without distribution"
+        run: echo "Nx Cloud temporarily disabled - configure access token to enable"
         continue-on-error: true
 
       - name: Install dependencies
@@ -64,27 +64,27 @@ jobs:
         with:
           directory: ./coverage
 
-  agents:
-    runs-on: ubuntu-latest
-    name: Agent ${{ matrix.agent }}
-    timeout-minutes: 60
-    strategy:
-      matrix:
-        agent: [1, 2, 3]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  # agents:
+  #   runs-on: ubuntu-latest
+  #   name: Agent ${{ matrix.agent }}
+  #   timeout-minutes: 60
+  #   strategy:
+  #     matrix:
+  #       agent: [1, 2, 3]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #         cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+  #     - name: Install dependencies
+  #       run: npm ci --legacy-peer-deps
 
-      - name: Start Nx Agent
-        run: npx nx-cloud start-agent
-        env:
-          NX_AGENT_NAME: ${{ matrix.agent }}
+  #     - name: Start Nx Agent
+  #       run: npx nx-cloud start-agent
+  #       env:
+  #         NX_AGENT_NAME: ${{ matrix.agent }}
