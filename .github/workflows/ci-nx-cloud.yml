@@ -44,14 +44,20 @@ jobs:
       # Run tasks affected by changes
       - name: Run Nx Affected Build
         run: npx nx affected --target=build --parallel=3
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ""
         
       - name: Run Nx Affected Lint (if configured)
         run: npx nx affected --target=lint --parallel=3 || echo "Linting not configured, skipping..."
         continue-on-error: true
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ""
         
       - name: Run Nx Affected Test (if configured)  
         run: npx nx affected --target=test --parallel=3 --ci --code-coverage || echo "Tests not configured, skipping..."
         continue-on-error: true
+        env:
+          NX_CLOUD_ACCESS_TOKEN: ""
 
       # Optional: Run E2E tests if they exist
       # - name: Run E2E tests
